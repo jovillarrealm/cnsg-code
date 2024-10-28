@@ -24,7 +24,7 @@ should_renew_file() {
 
 file="$scripts_dir"datasets
 
-if ! count-fasta-rs -h; then
+if ! count-fasta-rs -V; then
     curl --proto '=https' --tlsv1.2 -LsSf https://github.com/jovillarrealm/count-fasta-rs/releases/download/v0.5.3/count-fasta-rs-installer.sh | sh
 fi
 
