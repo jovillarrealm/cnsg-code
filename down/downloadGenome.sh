@@ -126,50 +126,45 @@ echo "Hardlinks made"
 
 
 # Stats if they don´t already exist
-stats_file="$output_dir""$taxon""_""$today""_stats.csv"
-stats_refseq_file="$ref_seq_dir""$taxon""_""$today""_refseq_stats.csv"
+dircount=0
 num_process="$(nproc)"
 num_process="$((num_process / 2))"
 
-
 # Make the file if it does not already exist
-if [ ! -f "$stats_file" ];then
-    echo "Analyzing secuences"
-    dircount=0
-    while IFS= read -r -d '' dir
-    do
-        stats_file="$output_dir""$taxon""_""$today""_stats$dircount.csv"
-        echo "$dir" and "$stats_file"
-        
+
+while IFS= read -r -d '' dir
+do
+    stats_file="$output_dir""$taxon""_""$today""_stats$dircount.csv"
+    if [ ! -f "$stats_file" ];then
         count-fasta-rs -c "$stats_file" -d "$dir"
         dircount=$((dircount + 1))
-        
-    done <   <(find "$output_dir" -name "GENOMIC*" -type d -print0)
-else
-    echo "Stats file already exists"
-    
-fi
+    else
+        echo "Stats file $stats_file already exists"
+    fi
+done <   <(find "$output_dir" -name "GENOMIC*" -type d -print0)
 
 
 
 
 if [[ -d "$ref_seq_dir" ]]; then
+    dircount=0
+    stats_refseq_file="$ref_seq_dir""$taxon""_""$today""_refseq_stats$dircount.csv"
     if [ ! -f "$stats_refseq_file" ];then
         echo "Analyzing Refseq secuences"
-        dircount=0
         while IFS= read -r -d '' dir
         do
-            stats_file="$output_dir""$taxon""_""$today""_stats$dircount.csv"
-            stats_file="$output_dir""$taxon""_""$today""_stats.csv"            
-            count-fasta-rs -c "$stats_file" -d "$dir"
-            dircount=$((dircount + 1))
-            
+            stats_refseq_file="$ref_seq_dir""$taxon""_""$today""_refseq_stats$dircount.csv"
+            if [ ! -f "$stats_refseq_file" ];then
+                count-fasta-rs -c "$stats_refseq_file" -d "$dir"
+                dircount=$((dircount + 1))
+            else
+                echo "Stats file $stats_refseq_file already exists"
+            fi
         done <   <(find "$output_dir" -name "GENOMIC*" -type d -print0)
     else
         echo "RefSeq Stats file already exists"
     fi
 fi
-count-fasta-plots "$stats_file"
 echo "** DONE **"
 end_time=$(date +%s)
 elapsed_time=$((end_time - start_time))
