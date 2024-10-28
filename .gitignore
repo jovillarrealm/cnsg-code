@@ -1,0 +1,5 @@
+down/dataformat
+down/datasets
+down/ncbi_api_key.txt
+**/__pycache__/
+**/.venv/
